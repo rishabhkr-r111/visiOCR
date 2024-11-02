@@ -1,11 +1,85 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'ocr/css/main.css' %}" />
+    <title>visiOCR</title>
   </head>
   <body>
-    test jjjjjjjjjjjjjjjjjjjjjjj
+    <header>
+      <h1>visiOCR</h1>
+    </header>
+
+    <main>
+      <div
+        id="uploadSection"
+        ondrop="handleDrop(event)"
+        ondragover="handleDragOver(event)"
+      >
+        <form id="uploadForm" enctype="multipart/form-data">
+          <input type="file" id="imageInput" accept="image/*" required />
+          <button type="button" onclick="processImage()">Process Image</button>
+        </form>
+        <p>Or drag and drop an image here</p>
+      </div>
+      <div id="result"></div>
+    </main>
+
+    <script>
+      function processImage() {
+        const formData = new FormData();
+        const imageInput = document.getElementById("imageInput").files[0];
+
+        if (!imageInput) {
+          alert("Please select an image.");
+          return;
+        }
+
+        formData.append("image", imageInput);
+
+        fetch("{% url 'process_image' %}", {
+          method: "POST",
+          body: formData,
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const resultDiv = document.getElementById("result");
+            if (data.message) {
+              resultDiv.innerHTML = `<p>${data.message}</p>`;
+              if (data.data) {
+                resultDiv.innerHTML += `<pre>${JSON.stringify(
+                  data.data,
+                  null,
+                  2
+                )}</pre>`;
+              }
+            } else if (data.error) {
+              resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById("result").innerHTML =
+              "<p>An error occurred.</p>";
+          });
+      }
+
+      function handleDrop(event) {
+        event.preventDefault();
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+          document.getElementById("imageInput").files = files;
+        }
+      }
+
+      function handleDragOver(event) {
+        event.preventDefault();
+      }
+    </script>
   </body>
 </html>
