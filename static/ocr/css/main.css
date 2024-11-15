@@ -1,55 +1,231 @@
-body,
-html {
+body, html {
   margin: 0;
   padding: 0;
   font-size: 1em;
-  background-color: #f9f9f9;
+  background-color: #121212;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+body {
   display: flex;
-  flex-direction: column;
-  height: 100vh;
 }
 
 header {
-  text-align: center;
-  padding: 20px 0;
+  padding: 20px 40px;
+  width: 100%;
+  background-color: #1a1a1a;
 }
 
-h1 {
-  font-size: 2em;
+header h1 {
+  font-size: 2.5em;
   font-weight: bold;
+  color: #ffffff;
   margin: 0;
+  padding-left: 20px;
+  border-left: 4px solid #007bff;
+  width: fit-content;
+}
+
+.head-img:hover{
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 main {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tab-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  flex: 1;
-  text-align: center;
-  flex-direction: column;
+  background-color: #1e1e1e;
+  max-width: fit-content;
+  margin-bottom: 30px;
+  border-radius: 50px;
+  padding: 5px;
+}
+
+.tab {
+  padding: 12px 24px;
+  border-radius: 50px;
+  margin: 0 5px;
+  cursor: pointer;
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.tab.active {
+  background-color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 #uploadSection {
-  width: 500px;
-  padding: 20px;
-  border: 2px dashed #aaa;
-  border-radius: 8px;
-  background-color: #fff;
+  width: 600px;
+  min-height: 300px;
+  padding: 40px;
+  border: 2px dashed #4a4a4a;
+  border-radius: 12px;
+  background-color: #1e1e1e;
   cursor: pointer;
+  color: #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+#uploadSection:hover {
+  border-color: #007bff;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
 }
 
 #uploadForm {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  justify-content: center;
+  gap: 20px;
   align-items: center;
 }
 
 #uploadForm input[type="file"] {
-  text-align: center;
+  background-color: #2a2a2a;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  color: #e0e0e0;
+  width: 80%;
+}
+
+#uploadForm button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#uploadForm button:hover {
+  background-color: #0056b3;
 }
 
 #result {
+  margin-top: 30px;
+  color: #e0e0e0;
+}
+
+.card {
+  width: 300px;
+  margin: 20px auto;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  background-color: #f8f9fa;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.download-card {
+  color: white;
+  background-color: #007bff;
+  cursor: pointer;
+  border-radius: 25px;
+  padding: 12px 24px;
+  width: 300px;
+  border: none;
+  transition: background-color 0.3s ease;
   margin-top: 20px;
+  margin: auto;
+}
+
+.download-card:hover {
+  background-color: #0056b3;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  top: 0;
+  left: 0;
+}
+
+.modal-content {
+  background-color: #1e1e1e;
+  margin: 10% auto;
+  padding: 30px;
+  border: 1px solid #333;
+  width: 400px;
+  border-radius: 12px;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close-button:hover {
+  color: #fff;
+}
+
+#modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#modalForm label {
+  color: #e0e0e0;
+  margin-bottom: 5px;
+}
+
+#modalForm input,
+#modalForm select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+#modalForm button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+#modalForm button:hover {
+  background-color: #0056b3;
+}
+
+#imagePreview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

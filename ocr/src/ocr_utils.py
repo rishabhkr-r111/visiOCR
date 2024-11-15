@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 import re
 import hashlib
+from datetime import datetime
+import pytz
 
 pytesseract.pytesseract.tesseract_cmd = r'D:\Program Files\Tesseract-OCR\tesseract.exe'
 
@@ -76,6 +78,25 @@ def classify_and_extract(text):
         return None
 
     return data
+
+def convert_to_ist(iso_timestamp):
+    if not iso_timestamp:
+        return None
+        
+    # Parse the ISO timestamp
+    if isinstance(iso_timestamp, str):
+        utc_dt = datetime.fromisoformat(iso_timestamp.replace('Z', '+00:00'))
+    else:
+        utc_dt = iso_timestamp
+        
+    # Get IST timezone
+    ist = pytz.timezone('Asia/Kolkata')
+    
+    # Convert to IST
+    ist_dt = utc_dt.astimezone(ist)
+    
+    # Format the datetime
+    return ist_dt.strftime('%d %b, %Y %I:%M %p IST')
 
 # def create_db():
 #     conn = sqlite3.connect('id_data.db')

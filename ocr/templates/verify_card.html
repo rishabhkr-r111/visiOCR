@@ -1,0 +1,11 @@
+{% load static %}
+<div class="card">
+    <h1  style="color: black;">VISITING CARD</h1>
+    <h1 style="color: green;"> VALID </h1>
+    <h2 style="color: black;">{{ id_info.name }}</h2>
+    <p  style="color: black;"><strong>Mobile:</strong> {{id_info.mobile_number}} </p>
+    <p  style="color: black;"><strong>Date of Birth:</strong> {{ id_info.dob }}</p>
+    <p  style="color: black;"><strong>Valid Till:</strong> {{ ist_time }} </p>
+    <p  style="color: black;"><strong>Generated Using:</strong> {{ id_info.id_type }}</p>
+</div>
+

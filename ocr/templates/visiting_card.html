@@ -1,0 +1,18 @@
+{% load static %}
+<div class="card">
+    <h1  style="color: black;">VISITING CARD</h1>
+    <h2 style="color: blue;">{{ id_info.name }}</h2>
+    <p  style="color: black;"><strong>Mobile:</strong> {{id_info.mobile_number}} </p>
+    <p  style="color: black;"><strong>Date of Birth:</strong> {{ id_info.dob }}</p>
+    <p  style="color: black;"><strong>Valid Till:</strong id="validTillIST"> {{ ist_time }} </p>
+    {% if qr_code %}
+        <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" width="200" height="200">
+    {% endif %}
+    <p  style="color: black;"><strong>Generated Using:</strong> {{ id_info.id_type }}</p>
+</div>
+<div class="download-card" onclick="downloadCard()">
+    Download
+</div>
+
+
+

@@ -5,30 +5,95 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{% static 'ocr/css/main.css' %}" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>visiOCR</title>
   </head>
   <body>
     <header>
       <h1>visiOCR</h1>
+      <img src="{% static 'imgs/id-card.png' %}" alt="visiOCR Logo" style="width: 95%; margin-top: 20px;" class="head-img"/>
     </header>
 
+   
     <main>
+       <div class="tab-container">
+      <a href="#" class="tab active">OCR</a>
+      <a href="/verify" class="tab">Verify</a>
+    </div>
+
       <div
         id="uploadSection"
         ondrop="handleDrop(event)"
         ondragover="handleDragOver(event)"
       >
         <form id="uploadForm" enctype="multipart/form-data">
+          <div id="imagePreview"></div>
           <input type="file" id="imageInput" accept="image/*" required />
-          <button type="button" onclick="processImage()">Process Image</button>
+          <button type="button" onclick="openModal()">Upload Image</button>
         </form>
-        <p>Or drag and drop an image here</p>
+        <p  style="text-align: center; margin-top: 80px;">Or drag and drop an image here</p>
       </div>
       <div id="result"></div>
     </main>
 
+  <div id="inputModal" class="modal">
+  <div class="modal-content">
+    <span class="close-button" onclick="closeModal()">&times;</span>
+    <h2>Enter Details</h2>
+    <form id="modalForm">
+      <label for="mobileNumber">Mobile Number:</label>
+      <input type="text" id="mobileNumber" name="mobileNumber" required />
+      
+      <label for="validTill">Valid Till:</label>
+      <select id="validTill" name="validTill" required></select>
+      <div>
+        <button type="button" onclick="submitForm()">Submit</button>
+
+      </div>
+    </form>
+  </div>
+</div>
+
     <script>
-      function processImage() {
+
+      function openModal() {
+        document.getElementById("inputModal").style.display = "block";
+      }
+
+      function closeModal() {
+        document.getElementById("inputModal").style.display = "none";
+      }
+
+      document.getElementById("imageInput").addEventListener("change", function () {
+        const imageInput = document.getElementById("imageInput").files[0];
+        const imagePreviewDiv = document.getElementById("imagePreview");
+        imagePreviewDiv.innerHTML = "";
+
+        if (imageInput) {
+          const img = document.createElement("img");
+          img.src = URL.createObjectURL(imageInput);
+          img.alt = "Uploaded Image";
+          img.style.maxWidth = "50%";
+          img.onload = function () {
+            URL.revokeObjectURL(img.src);
+          };
+          imagePreviewDiv.appendChild(img);
+        }
+      });
+
+
+      function submitForm() {
+        const mobileNumber = document.getElementById("mobileNumber").value;
+        const validTill = document.getElementById("validTill").value;
+
+        if (!mobileNumber || !validTill) {
+          alert("All fields are required.");
+          return;
+        }
+
+        closeModal(); 
+
+
         const formData = new FormData();
         const imageInput = document.getElementById("imageInput").files[0];
 
@@ -38,6 +103,8 @@
         }
 
         formData.append("image", imageInput);
+        formData.append("mobile_number", mobileNumber);
+        formData.append("valid_till", validTill);
 
         fetch("{% url 'process_image' %}", {
           method: "POST",
@@ -46,26 +113,45 @@
             "X-CSRFToken": "{{ csrf_token }}",
           },
         })
-          .then((response) => response.json())
+          .then((response) => response.text()) 
           .then((data) => {
-            const resultDiv = document.getElementById("result");
-            if (data.message) {
-              resultDiv.innerHTML = `<p>${data.message}</p>`;
-              if (data.data) {
-                resultDiv.innerHTML += `<pre>${JSON.stringify(
-                  data.data,
-                  null,
-                  2
-                )}</pre>`;
-              }
-            } else if (data.error) {
-              resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
-            }
+            const mainElement = document.querySelector("#uploadSection");
+            mainElement.innerHTML = data;
           })
           .catch((error) => {
             console.error("Error:", error);
-            document.getElementById("result").innerHTML =
-              "<p>An error occurred.</p>";
+            document.getElementById("result").innerHTML = "<p>An error occurred.</p>";
+          });
+      }
+
+            function processImage() {
+              const formData = new FormData();
+              const imageInput = document.getElementById("imageInput").files[0];
+
+              if (!imageInput) {
+                alert("Please select an image.");
+                return;
+              }
+
+              formData.append("image", imageInput);
+
+              fetch("{% url 'process_image' %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                  "X-CSRFToken": "{{ csrf_token }}",
+                },
+              })
+                .then((response) => response.text()) 
+                .then((data) => {
+                console.log(data);
+                const mainElement = document.querySelector("#uploadSection");
+                console.log(mainElement);
+                mainElement.innerHTML = data;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById("result").innerHTML = "<p>An error occurred.</p>";
           });
       }
 
@@ -74,12 +160,62 @@
         const files = event.dataTransfer.files;
         if (files.length > 0) {
           document.getElementById("imageInput").files = files;
+
+          const imagePreviewDiv = document.getElementById("imagePreview");
+          imagePreviewDiv.innerHTML = "";
+          const img = document.createElement("img");
+          img.src = URL.createObjectURL(files[0]);
+          img.alt = "Uploaded Image";
+          img.style.maxWidth = "50%";
+          img.onload = function () {
+            URL.revokeObjectURL(img.src);
+          };
+          imagePreviewDiv.appendChild(img);
         }
       }
 
       function handleDragOver(event) {
         event.preventDefault();
       }
+
+      function click() {
+        console.log("click");
+      }
+
+      function downloadCard() {
+        const cardElement = document.querySelector('.card');
+        console.log(cardElement);
+
+        html2canvas(cardElement).then((canvas) => {
+          console.log(canvas);
+          const link = document.createElement('a');
+          link.download = 'visiting_card.png'; 
+          link.href = canvas.toDataURL('image/png'); 
+          link.click(); 
+        });
+      }
+
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const validTillSelect = document.getElementById("validTill");
+        const currentDate = new Date();
+        console.log(currentDate);
+
+        for (let i = 2; i <= 6; i++) {
+          const optionTime = new Date(currentDate);
+          optionTime.setHours(currentDate.getHours() + i);
+          console.log(optionTime.toISOString());
+
+          const option = document.createElement("option");
+          option.value = optionTime.toISOString();  
+          option.textContent = `${i} hours from now`;
+
+          validTillSelect.appendChild(option);
+        }
+      });
+
+
+
     </script>
   </body>
 </html>

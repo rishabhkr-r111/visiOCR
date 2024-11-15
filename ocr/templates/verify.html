@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{% static 'ocr/css/main.css' %}" />
+    <title>Verify - visiOCR</title>
+    <style>
+      .modal {
+        display: none;
+        position: absolute;
+        z-index: 1;
+        left: 35%;
+        top: 35%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0);
+      }
+      
+      .modal-content {
+        background-color: black;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 300px;
+        border-radius: 8px;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .close-button {
+        float: right;
+        font-size: 24px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>visiOCR</h1>
+      <img src="{% static 'imgs/id-card.png' %}" alt="visiOCR Logo" style="width: 95%; margin-top: 20px;" class="head-img"/>
+    </header>
+
+    <main>
+      <div class="tab-container">
+        <a href="/" class="tab">OCR</a>
+        <a href="#" class="tab active">Verify</a>
+      </div>
+
+      <div
+        id="uploadSection"
+        ondrop="handleDrop(event)"
+        ondragover="handleDragOver(event)"
+      >
+        <form id="uploadForm" enctype="multipart/form-data">
+          <div id="imagePreview"></div>
+          <input type="file" id="imageInput" accept="image/*" required />
+          <button type="button" onclick="submitVerification()">Verify ID</button>
+        </form>
+        <p style="text-align: center; margin-top: 80px;">Or drag and drop an image here</p>
+      </div>
+    </main>
+
+    <script>
+      function handleDrop(event) {
+        event.preventDefault();
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+          document.getElementById("imageInput").files = files;
+          const imagePreviewDiv = document.getElementById("imagePreview");
+          imagePreviewDiv.innerHTML = "";
+          const img = document.createElement("img");
+          img.src = URL.createObjectURL(files[0]);
+          img.alt = "Uploaded Image";
+          img.style.maxHeight = "10%";
+          img.onload = function () {
+            URL.revokeObjectURL(img.src);
+          };
+          imagePreviewDiv.appendChild(img);
+        }
+      }
+
+      function handleDragOver(event) {
+        event.preventDefault();
+      }
+
+      document.getElementById("imageInput").addEventListener("change", function () {
+        const imageInput = document.getElementById("imageInput").files[0];
+        const imagePreviewDiv = document.getElementById("imagePreview");
+        imagePreviewDiv.innerHTML = "";
+
+        if (imageInput) {
+          const img = document.createElement("img");
+          img.src = URL.createObjectURL(imageInput);
+          img.alt = "Uploaded Image";
+          img.style.maxWidth = "50%";
+          img.onload = function () {
+            URL.revokeObjectURL(img.src);
+          };
+          imagePreviewDiv.appendChild(img);
+        }
+      });
+
+      function submitVerification() {
+        const formData = new FormData();
+        const imageInput = document.getElementById("imageInput").files[0];
+
+        if (!imageInput) {
+          alert("Please select an image.");
+          return;
+        }
+
+        formData.append("image", imageInput);
+
+        fetch("{% url 'verify_id' %}", {
+          method: "POST",
+          body: formData,
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+          },
+        })
+          .then((response) => response.text())
+          .then((data) => {
+            const resultDiv = document.getElementById("uploadSection");
+            resultDiv.innerHTML = data;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById("verificationResult").innerHTML = "<p>An error occurred.</p>";
+          });
+      }
+    </script>
+  </body>
+</html>
