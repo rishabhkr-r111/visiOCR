@@ -5,45 +5,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{% static 'ocr/css/main.css' %}" />
-    <title>Verify - visiOCR</title>
-    <style>
-      .modal {
-        display: none;
-        position: absolute;
-        z-index: 1;
-        left: 35%;
-        top: 35%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0);
-      }
-      
-      .modal-content {
-        background-color: black;
-        margin: 10% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 300px;
-        border-radius: 8px;
-        text-align: center;
-        padding: 20px;
-      }
-
-      .close-button {
-        float: right;
-        font-size: 24px;
-        cursor: pointer;
-      }
-    </style>
+    <title>DocuPass</title>
+    
   </head>
   <body>
     <header>
-      <h1>visiOCR</h1>
+      <h1>DocuPass <span style="font-size: 11px;">A visiOCR System</span></h1>
       <img src="{% static 'imgs/id-card.png' %}" alt="visiOCR Logo" style="width: 95%; margin-top: 20px;" class="head-img"/>
     </header>
 
     <main>
       <div class="tab-container">
-        <a href="/" class="tab">OCR</a>
+        <a href="/" class="tab">Generate</a>
         <a href="#" class="tab active">Verify</a>
       </div>
 
